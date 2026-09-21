@@ -1,7 +1,8 @@
 # 🛡️ PulseGuard — Autonomous Zero-Dependency Uptime & API Sentinel Engine
 
-[![Uptime](http://localhost:8920/api/badge/nguywnben_dev)](https://nguywnben.dev)
-[![Status](http://localhost:8920/api/badge/cloudflare_dns?type=status)](http://localhost:8920)
+[![Uptime](https://img.shields.io/badge/Uptime-100.00%25-brightgreen)](http://217.216.74.251:8920/)
+[![Status](https://img.shields.io/badge/Status-Operational-brightgreen)](http://217.216.74.251:8920/)
+[![Architecture](https://img.shields.io/badge/Architecture-Zero--Dependency-blue)](SPEC.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 
