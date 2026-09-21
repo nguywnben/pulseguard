@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseGuard — Autonomous Uptime & Sentinel Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090a0f;
+      --card-bg: rgba(18, 20, 29, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+      --accent-blue: #3b82f6;
+      --bar-empty: rgba(255, 255, 255, 0.05);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      padding: 2.5rem 1rem;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1.5rem;
+    }
+    .brand-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--accent-green);
+      animation: pulse 2s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .brand-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+    .overall-banner {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(12px);
+    }
+    .status-badge-lg {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--accent-green);
+    }
+    .stat-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      color: var(--text-muted);
+    }
+    .stat-pill strong {
+      color: var(--text);
+    }
+    .group-header {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin: 2rem 0 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .monitor-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 0.875rem;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s, transform 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    .monitor-card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .monitor-name {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .protocol-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      padding: 0.15rem 0.45rem;
+      border-radius: 0.25rem;
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+    }
+    .card-metrics {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.825rem;
+    }
+    .uptime-pct {
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+    .latency-val {
+      color: var(--text-muted);
+    }
+    .history-bars {
+      display: grid;
+      grid-template-columns: repeat(60, 1fr);
+      gap: 3px;
+      height: 28px;
+      margin-top: 0.5rem;
+    }
+    .bar {
+      border-radius: 2px;
+      background: var(--bar-empty);
+      height: 100%;
+      position: relative;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .bar:hover {
+      opacity: 0.7;
+    }
+    .bar.up { background: var(--accent-green); }
+    .bar.degraded { background: var(--accent-amber); }
+    .bar.down { background: var(--accent-red); }
+    .bar.none { background: var(--bar-empty); }
+
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.75rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .cert-pill {
+      font-size: 0.75rem;
+      color: var(--accent-blue);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    footer {
+      margin-top: 4rem;
+      border-top: 1px solid var(--card-border);
+      padding-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    a {
+      color: var(--accent-blue);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .actions-bar {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.4rem 0.85rem;
+      border-radius: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="brand-title">
+          <div class="pulse-dot"></div>
+          PulseGuard Sentinel
+        </div>
+        <div class="brand-subtitle">Autonomous Zero-Dependency Uptime & Reliability Engine</div>
+      </div>
+      <div class="actions-bar">
+        <button class="btn" onclick="fetchStatus()">Refresh</button>
+        <a href="/api/status" target="_blank" class="btn">JSON API</a>
+      </div>
+    </header>
+
+    <div class="overall-banner" id="banner">
+      <div class="status-badge-lg">
+        <span id="banner-text">Evaluating Systems...</span>
+      </div>
+      <div class="stat-pill">
+        Last Checked: <strong id="last-updated">--</strong>
+      </div>
+    </div>
+
+    <div id="monitors-container">
+      <!-- Dynamically Rendered Cards -->
+    </div>
+
+    <footer>
+      <div>Engineered by <strong>Nguyen Cong Ben</strong> &bull; PulseGuard v1.0.0</div>
+      <div>100% Pure Async Python (Zero Pip Dependencies)</div>
+    </footer>
+  </div>
+
+  <script>
+    async function fetchStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        renderDashboard(data);
+      } catch (e) {
+        console.error('Failed to load status:', e);
+      }
+    }
+
+    function renderDashboard(data) {
+      const bannerText = document.getElementById('banner-text');
+      const lastUpdated = document.getElementById('last-updated');
+      const container = document.getElementById('monitors-container');
+
+      const allUp = data.overall_status === 'up';
+      bannerText.textContent = allUp ? 'All Systems Operational' : 'Degraded System Performance';
+      bannerText.style.color = allUp ? '#10b981' : '#ef4444';
+      lastUpdated.textContent = new Date(data.timestamp * 1000).toLocaleTimeString();
+
+      container.innerHTML = '';
+      const groups = {};
+      data.monitors.forEach(m => {
+        const g = m.group_name || 'Default';
+        if (!groups[g]) groups[g] = [];
+        groups[g].push(m);
+      });
+
+      for (const [groupName, monitors] of Object.entries(groups)) {
+        const groupEl = document.createElement('div');
+        groupEl.className = 'group-header';
+        groupEl.textContent = groupName;
+        container.appendChild(groupEl);
+
+        monitors.forEach(m => {
+          const card = document.createElement('div');
+          card.className = 'monitor-card';
+
+          const barsHtml = (m.stats.daily_bars || []).map(b => {
+            const title = `${b.date}: ${b.uptime_pct !== null ? b.uptime_pct + '%' : 'No data'} (${b.avg_latency}ms)`;
+            return `<div class="bar ${b.status}" title="${title}"></div>`;
+          }).join('');
+
+          const isUp = m.latest_heartbeat ? m.latest_heartbeat.is_up : true;
+          const statusDot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${isUp ? '#10b981' : '#ef4444'};"></span>`;
+
+          const certInfo = m.latest_heartbeat && m.latest_heartbeat.cert_days_remaining !== null
+            ? `<span class="cert-pill">🔒 SSL: ${m.latest_heartbeat.cert_days_remaining}d left</span>`
+            : '';
+
+          card.innerHTML = `
+            <div class="card-top">
+              <div class="monitor-name">
+                ${statusDot}
+                <span>${m.name}</span>
+                <span class="protocol-tag">${m.type}</span>
+              </div>
+              <div class="card-metrics">
+                <span class="uptime-pct">${m.stats.uptime_24h || 100}%</span>
+                <span class="latency-val">${m.latest_heartbeat ? m.latest_heartbeat.latency_ms + ' ms' : '--'}</span>
+              </div>
+            </div>
+            <div class="history-bars">
+              ${barsHtml}
+            </div>
+            <div class="card-bottom">
+              <div>60 days ago</div>
+              <div>${certInfo}</div>
+              <div>Today (99.9% target)</div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+    }
+
+    fetchStatus();
+    setInterval(fetchStatus, 15000); // Auto-refresh every 15s
+  </script>
+</body>
+</html>

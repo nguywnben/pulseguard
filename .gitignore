@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+pulseguard.db
+pulseguard.db-wal
+pulseguard.db-shm
+.pytest_cache/

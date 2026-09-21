@@ -1,0 +1,15 @@
+[Unit]
+Description=PulseGuard Autonomous Uptime & API Sentinel Engine
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/pulseguard
+ExecStart=/usr/bin/python3 /root/pulseguard/cli.py start
+Restart=always
+RestartSec=5s
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
